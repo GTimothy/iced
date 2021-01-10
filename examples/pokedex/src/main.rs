@@ -264,3 +264,18 @@ mod style {
         }
     }
 }
+
+/// This test only verifies that the example does not panic in the first 5 seconds of its execution.
+#[cfg(test)]
+mod test{
+    use rusty_fork::rusty_fork_test;
+    rusty_fork_test!{
+        #![rusty_fork(timeout_ms = 5000)]
+
+        #[test]
+        #[should_panic(expected = "child process exceeded 5000 ms timeout")]
+        fn test_name() {
+            crate::main().unwrap()
+        }
+    }
+}

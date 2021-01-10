@@ -8,3 +8,6 @@ publish = false
 [dependencies]
 iced = { path = "../.." }
 iced_native = { path = "../../native" }
+
+[dev-dependencies]
+rusty-fork = "0.3.0"

@@ -7,3 +7,6 @@ publish = false
 
 [dependencies]
 iced = { path = "../..", features = ["qr_code"] }
+
+[dev-dependencies]
+rusty-fork = "0.3.0"

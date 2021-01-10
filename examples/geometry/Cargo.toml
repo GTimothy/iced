@@ -9,3 +9,6 @@ publish = false
 iced = { path = "../.." }
 iced_native = { path = "../../native" }
 iced_graphics = { path = "../../graphics" }
+
+[dev-dependencies]
+rusty-fork = "0.3.0"

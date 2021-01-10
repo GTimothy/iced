@@ -7,3 +7,6 @@ publish = false
 
 [dependencies]
 iced = { path = "../..", features = ["canvas"] }
+
+[dev-dependencies]
+rusty-fork = "0.3.0"
