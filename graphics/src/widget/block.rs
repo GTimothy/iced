@@ -1,13 +1,13 @@
 use crate::{Backend, Primitive, Renderer};
-use iced_native::column;
+use iced_native::block;
 use iced_native::mouse;
 use iced_native::{Element, Layout, Point, Rectangle};
 
 /// A container that distributes its contents vertically.
-pub type Column<'a, Message, Backend> =
-    iced_native::Column<'a, Message, Renderer<Backend>>;
+pub type Block<'a, Message, Backend> =
+    iced_native::Block<'a, Message, Renderer<Backend>>;
 
-impl<B> column::Renderer for Renderer<B>
+impl<B> block::Renderer for Renderer<B>
 where
     B: Backend,
 {

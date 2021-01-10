@@ -47,14 +47,14 @@ where
     /// #     pub use iced_native::renderer::Null as Renderer;
     /// # }
     /// #
-    /// # use iced_native::Column;
+    /// # use iced_native::Block;
     /// #
     /// # pub struct Counter;
     /// #
     /// # impl Counter {
     /// #     pub fn new() -> Self { Counter }
-    /// #     pub fn view(&self) -> Column<(), Renderer> {
-    /// #         Column::new()
+    /// #     pub fn view(&self) -> Block<(), Renderer> {
+    /// #         Block::new()
     /// #     }
     /// # }
     /// // Initialization
@@ -141,14 +141,14 @@ where
     /// #     pub use iced_native::renderer::Null as Renderer;
     /// # }
     /// #
-    /// # use iced_native::Column;
+    /// # use iced_native::Block;
     /// #
     /// # pub struct Counter;
     /// #
     /// # impl Counter {
     /// #     pub fn new() -> Self { Counter }
-    /// #     pub fn view(&self) -> Column<(), Renderer> {
-    /// #         Column::new()
+    /// #     pub fn view(&self) -> Block<(), Renderer> {
+    /// #         Block::new()
     /// #     }
     /// #     pub fn update(&mut self, message: ()) {}
     /// # }
@@ -276,14 +276,14 @@ where
     /// #     pub use iced_native::renderer::Null as Renderer;
     /// # }
     /// #
-    /// # use iced_native::Column;
+    /// # use iced_native::Block;
     /// #
     /// # pub struct Counter;
     /// #
     /// # impl Counter {
     /// #     pub fn new() -> Self { Counter }
-    /// #     pub fn view(&self) -> Column<(), Renderer> {
-    /// #         Column::new()
+    /// #     pub fn view(&self) -> Block<(), Renderer> {
+    /// #         Block::new()
     /// #     }
     /// #     pub fn update(&mut self, message: ()) {}
     /// # }

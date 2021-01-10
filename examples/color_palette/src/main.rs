@@ -1,7 +1,7 @@
 use iced::canvas::{self, Cursor, Frame, Geometry, Path};
 use iced::{
-    slider, Align, Canvas, Color, Column, Element, HorizontalAlignment, Length,
-    Point, Rectangle, Row, Sandbox, Settings, Size, Slider, Text, Vector,
+    slider, Align, Axis, Canvas, Color, Block, Element, HorizontalAlignment, Length,
+    Point, Rectangle, Sandbox, Settings, Size, Slider, Text, Vector,
     VerticalAlignment,
 };
 use palette::{self, Hsl, Limited, Srgb};
@@ -70,7 +70,7 @@ impl Sandbox for ColorPalette {
         let lab = palette::Lab::from(srgb);
         let lch = palette::Lch::from(srgb);
 
-        Column::new()
+        Block::new(Axis::Vertical)
             .padding(10)
             .spacing(10)
             .push(self.rgb.view(base).map(Message::RgbColorChanged))
@@ -296,7 +296,7 @@ impl<C: 'static + ColorSpace + Copy> ColorPicker<C> {
             .step(0.01)
         }
 
-        Row::new()
+        Block::new(Axis::Horizontal)
             .spacing(10)
             .align_items(Align::Center)
             .push(Text::new(C::LABEL).width(Length::Units(50)))

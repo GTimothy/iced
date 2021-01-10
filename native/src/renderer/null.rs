@@ -1,5 +1,5 @@
 use crate::{
-    button, checkbox, column, container, pane_grid, progress_bar, radio, row,
+    block, button, checkbox, container, pane_grid, progress_bar, radio,
     scrollable, slider, text, text_input, Color, Element, Font,
     HorizontalAlignment, Layout, Point, Rectangle, Renderer, Size,
     VerticalAlignment,
@@ -26,19 +26,7 @@ impl Renderer for Null {
     }
 }
 
-impl column::Renderer for Null {
-    fn draw<Message>(
-        &mut self,
-        _defaults: &Self::Defaults,
-        _content: &[Element<'_, Message, Self>],
-        _layout: Layout<'_>,
-        _cursor_position: Point,
-        _viewport: &Rectangle,
-    ) {
-    }
-}
-
-impl row::Renderer for Null {
+impl block::Renderer for Null {
     fn draw<Message>(
         &mut self,
         _defaults: &Self::Defaults,

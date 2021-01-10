@@ -1,4 +1,4 @@
-use iced::{slider, Column, Element, ProgressBar, Sandbox, Settings, Slider};
+use iced::{slider, Axis, Block, Element, ProgressBar, Sandbox, Settings, Slider};
 
 pub fn main() -> iced::Result {
     Progress::run(Settings::default())
@@ -33,7 +33,7 @@ impl Sandbox for Progress {
     }
 
     fn view(&mut self) -> Element<Message> {
-        Column::new()
+        Block::new(Axis::Vertical)
             .padding(20)
             .push(ProgressBar::new(0.0..=100.0, self.value))
             .push(

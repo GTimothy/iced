@@ -2,12 +2,12 @@
 use crate::event::{self, Event};
 use crate::layout;
 use crate::mouse;
-use crate::row;
+use crate::block;
 use crate::text;
 use crate::touch;
 use crate::{
-    Align, Clipboard, Element, Hasher, HorizontalAlignment, Layout, Length,
-    Point, Rectangle, Row, Text, VerticalAlignment, Widget,
+    Align, Block, Clipboard, Element, Hasher, HorizontalAlignment, Layout, Length,
+    Point, Rectangle, Text, VerticalAlignment, Widget,
 };
 
 use std::hash::Hash;
@@ -119,7 +119,7 @@ where
 impl<Message, Renderer> Widget<Message, Renderer> for Radio<Message, Renderer>
 where
     Message: Clone,
-    Renderer: self::Renderer + text::Renderer + row::Renderer,
+    Renderer: self::Renderer + text::Renderer + block::Renderer,
 {
     fn width(&self) -> Length {
         self.width
@@ -134,12 +134,12 @@ where
         renderer: &Renderer,
         limits: &layout::Limits,
     ) -> layout::Node {
-        Row::<(), Renderer>::new()
+        Block::<(), Renderer>::new(layout::flex::Axis::Horizontal)
             .width(self.width)
             .spacing(self.spacing)
             .align_items(Align::Center)
             .push(
-                Row::new()
+                Block::new(layout::flex::Axis::Horizontal)
                     .width(Length::Units(self.size))
                     .height(Length::Units(self.size)),
             )
@@ -259,7 +259,7 @@ impl<'a, Message, Renderer> From<Radio<Message, Renderer>>
     for Element<'a, Message, Renderer>
 where
     Message: 'a + Clone,
-    Renderer: 'a + self::Renderer + row::Renderer + text::Renderer,
+    Renderer: 'a + self::Renderer + block::Renderer + text::Renderer,
 {
     fn from(radio: Radio<Message, Renderer>) -> Element<'a, Message, Renderer> {
         Element::new(radio)

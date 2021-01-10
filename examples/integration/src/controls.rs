@@ -1,8 +1,5 @@
 use iced_wgpu::Renderer;
-use iced_winit::{
-    slider, Align, Color, Column, Command, Element, Length, Program, Row,
-    Slider, Text,
-};
+use iced_winit::{Align , Axis, Text ,Slider ,Program ,Length ,Element ,Command ,Color ,Block ,slider};
 
 pub struct Controls {
     background_color: Color,
@@ -45,7 +42,7 @@ impl Program for Controls {
         let [r, g, b] = &mut self.sliders;
         let background_color = self.background_color;
 
-        let sliders = Row::new()
+        let sliders = Block::new(Axis::Horizontal)
             .width(Length::Units(500))
             .spacing(20)
             .push(
@@ -76,16 +73,16 @@ impl Program for Controls {
                 .step(0.01),
             );
 
-        Row::new()
+        Block::new(Axis::Horizontal)
             .width(Length::Fill)
             .height(Length::Fill)
             .align_items(Align::End)
             .push(
-                Column::new()
+                Block::new(Axis::Vertical)
                     .width(Length::Fill)
                     .align_items(Align::End)
                     .push(
-                        Column::new()
+                        Block::new(Axis::Vertical)
                             .padding(10)
                             .spacing(10)
                             .push(

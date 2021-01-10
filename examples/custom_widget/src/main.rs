@@ -84,7 +84,7 @@ mod circle {
 
 use circle::Circle;
 use iced::{
-    slider, Align, Column, Container, Element, Length, Sandbox, Settings,
+    slider, Align, Axis, Block, Container, Element, Length, Sandbox, Settings,
     Slider, Text,
 };
 
@@ -125,7 +125,7 @@ impl Sandbox for Example {
     }
 
     fn view(&mut self) -> Element<Message> {
-        let content = Column::new()
+        let content = Block::new(Axis::Vertical)
             .padding(20)
             .spacing(20)
             .max_width(500)

@@ -1,8 +1,4 @@
-use iced::{
-    button, executor, keyboard, pane_grid, scrollable, Align, Application,
-    Button, Color, Column, Command, Container, Element, HorizontalAlignment,
-    Length, PaneGrid, Row, Scrollable, Settings, Subscription, Text,
-};
+use iced::{Align ,Text ,Subscription ,Settings ,Scrollable ,PaneGrid ,Length ,HorizontalAlignment ,Element ,Container ,Command ,Color ,Button ,Block ,Axis ,Application ,button, executor, keyboard, pane_grid, scrollable};
 use iced_native::{event, subscription, Event};
 
 pub fn main() -> iced::Result {
@@ -141,7 +137,7 @@ impl Application for Example {
         let pane_grid = PaneGrid::new(&mut self.panes, |pane, content| {
             let is_focused = focus == Some(pane);
 
-            let title = Row::with_children(vec![
+            let title = Block::with_children(vec![
                 Text::new("Pane").into(),
                 Text::new(content.id.to_string())
                     .color(if is_focused {
@@ -150,7 +146,8 @@ impl Application for Example {
                         PANE_ID_COLOR_UNFOCUSED
                     })
                     .into(),
-            ])
+            ],
+            Axis::Horizontal)
             .spacing(5);
 
             let title_bar = pane_grid::TitleBar::new(title)
@@ -252,7 +249,7 @@ impl Content {
             .style(style)
         };
 
-        let mut controls = Column::new()
+        let mut controls = Block::new(Axis::Vertical)
             .spacing(5)
             .max_width(150)
             .push(button(
@@ -277,7 +274,7 @@ impl Content {
             ));
         }
 
-        let content = Scrollable::new(scroll)
+        let content = Scrollable::new(scroll, Axis::Vertical)
             .width(Length::Fill)
             .spacing(10)
             .align_items(Align::Center)

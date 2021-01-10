@@ -1,6 +1,6 @@
 use iced::{
-    button, futures, image, Align, Application, Button, Column, Command,
-    Container, Element, Length, Row, Settings, Text,
+    button, futures, image, Align, Axis, Application, Button, Block, Command,
+    Container, Element, Length, Settings, Text,
 };
 
 pub fn main() -> iced::Result {
@@ -79,10 +79,10 @@ impl Application for Pokedex {
 
     fn view(&mut self) -> Element<Message> {
         let content = match self {
-            Pokedex::Loading => Column::new()
+            Pokedex::Loading => Block::new(Axis::Vertical)
                 .width(Length::Shrink)
                 .push(Text::new("Searching for Pokémon...").size(40)),
-            Pokedex::Loaded { pokemon, search } => Column::new()
+            Pokedex::Loaded { pokemon, search } => Block::new(Axis::Vertical)
                 .max_width(500)
                 .spacing(20)
                 .align_items(Align::End)
@@ -90,7 +90,7 @@ impl Application for Pokedex {
                 .push(
                     button(search, "Keep searching!").on_press(Message::Search),
                 ),
-            Pokedex::Errored { try_again, .. } => Column::new()
+            Pokedex::Errored { try_again, .. } => Block::new(Axis::Vertical)
                 .spacing(20)
                 .align_items(Align::End)
                 .push(Text::new("Whoops! Something went wrong...").size(40))
@@ -119,7 +119,7 @@ impl Pokemon {
     const TOTAL: u16 = 807;
 
     fn view(&mut self) -> Element<Message> {
-        Row::new()
+        Block::new(Axis::Horizontal)
             .spacing(20)
             .align_items(Align::Center)
             .push(image::Viewer::new(
@@ -127,10 +127,10 @@ impl Pokemon {
                 self.image.clone(),
             ))
             .push(
-                Column::new()
+                Block::new(Axis::Vertical)
                     .spacing(20)
                     .push(
-                        Row::new()
+                        Block::new(Axis::Horizontal)
                             .align_items(Align::Center)
                             .spacing(20)
                             .push(

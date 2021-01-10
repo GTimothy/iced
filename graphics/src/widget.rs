@@ -7,6 +7,7 @@
 //! ```
 //! use iced_graphics::{button, Button};
 //! ```
+
 pub mod button;
 pub mod checkbox;
 pub mod container;
@@ -21,8 +22,7 @@ pub mod slider;
 pub mod svg;
 pub mod text_input;
 
-mod column;
-mod row;
+mod block;
 mod space;
 mod text;
 
@@ -49,9 +49,8 @@ pub use slider::Slider;
 #[doc(no_inline)]
 pub use text_input::TextInput;
 
-pub use column::Column;
+pub use block::Block;
 pub use image::Image;
-pub use row::Row;
 pub use space::Space;
 pub use svg::Svg;
 pub use text::Text;

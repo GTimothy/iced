@@ -1,8 +1,4 @@
-use iced::{
-    button, scrollable, slider, text_input, Button, Checkbox, Color, Column,
-    Container, Element, HorizontalAlignment, Image, Length, Radio, Row,
-    Sandbox, Scrollable, Settings, Slider, Space, Text, TextInput,
-};
+use iced::{Axis ,TextInput ,Text ,Space ,Slider ,Settings ,Scrollable ,Sandbox ,Radio ,Length ,Image ,HorizontalAlignment ,Element ,Container ,Color ,Checkbox ,Button ,Block ,button, scrollable, slider, text_input};
 
 pub fn main() -> iced::Result {
     env_logger::init();
@@ -58,7 +54,7 @@ impl Sandbox for Tour {
             ..
         } = self;
 
-        let mut controls = Row::new();
+        let mut controls = Block::new(Axis::Horizontal);
 
         if steps.has_previous() {
             controls = controls.push(
@@ -78,7 +74,7 @@ impl Sandbox for Tour {
             );
         }
 
-        let content: Element<_> = Column::new()
+        let content: Element<_> = Block::new(Axis::Vertical)
             .max_width(540)
             .spacing(20)
             .padding(20)
@@ -92,7 +88,7 @@ impl Sandbox for Tour {
             content
         };
 
-        let scrollable = Scrollable::new(scroll)
+        let scrollable = Scrollable::new(scroll, Axis::Vertical)
             .push(Container::new(content).width(Length::Fill).center_x());
 
         Container::new(scrollable)
@@ -349,11 +345,11 @@ impl<'a> Step {
         .into()
     }
 
-    fn container(title: &str) -> Column<'a, StepMessage> {
-        Column::new().spacing(20).push(Text::new(title).size(50))
+    fn container(title: &str) -> Block<'a, StepMessage> {
+        Block::new(Axis::Vertical).spacing(20).push(Text::new(title).size(50))
     }
 
-    fn welcome() -> Column<'a, StepMessage> {
+    fn welcome() -> Block<'a, StepMessage> {
         Self::container("Welcome!")
             .push(Text::new(
                 "This is a simple tour meant to showcase a bunch of widgets \
@@ -385,7 +381,7 @@ impl<'a> Step {
     fn slider(
         state: &'a mut slider::State,
         value: u8,
-    ) -> Column<'a, StepMessage> {
+    ) -> Block<'a, StepMessage> {
         Self::container("Slider")
             .push(Text::new(
                 "A slider allows you to smoothly select a value from a range \
@@ -412,7 +408,7 @@ impl<'a> Step {
         layout: Layout,
         spacing_slider: &'a mut slider::State,
         spacing: u16,
-    ) -> Column<'a, StepMessage> {
+    ) -> Block<'a, StepMessage> {
         let row_radio = Radio::new(
             Layout::Row,
             "Row",
@@ -428,19 +424,19 @@ impl<'a> Step {
         );
 
         let layout_section: Element<_> = match layout {
-            Layout::Row => Row::new()
+            Layout::Row => Block::new(Axis::Horizontal)
                 .spacing(spacing)
                 .push(row_radio)
                 .push(column_radio)
                 .into(),
-            Layout::Column => Column::new()
+            Layout::Column => Block::new(Axis::Vertical)
                 .spacing(spacing)
                 .push(row_radio)
                 .push(column_radio)
                 .into(),
         };
 
-        let spacing_section = Column::new()
+        let spacing_section = Block::new(Axis::Vertical)
             .spacing(10)
             .push(Slider::new(
                 spacing_slider,
@@ -476,8 +472,8 @@ impl<'a> Step {
         size: u16,
         color_sliders: &'a mut [slider::State; 3],
         color: Color,
-    ) -> Column<'a, StepMessage> {
-        let size_section = Column::new()
+    ) -> Block<'a, StepMessage> {
+        let size_section = Block::new(Axis::Vertical)
             .padding(20)
             .spacing(20)
             .push(Text::new("You can change its size:"))
@@ -493,13 +489,13 @@ impl<'a> Step {
 
         let [red, green, blue] = color_sliders;
 
-        let color_sliders = Row::new()
+        let color_sliders = Block::new(Axis::Horizontal)
             .spacing(10)
             .push(color_slider(red, color.r, move |r| Color { r, ..color }))
             .push(color_slider(green, color.g, move |g| Color { g, ..color }))
             .push(color_slider(blue, color.b, move |b| Color { b, ..color }));
 
-        let color_section = Column::new()
+        let color_section = Block::new(Axis::Vertical)
             .padding(20)
             .spacing(20)
             .push(Text::new("And its color:"))
@@ -515,13 +511,13 @@ impl<'a> Step {
             .push(color_section)
     }
 
-    fn radio(selection: Option<Language>) -> Column<'a, StepMessage> {
-        let question = Column::new()
+    fn radio(selection: Option<Language>) -> Block<'a, StepMessage> {
+        let question = Block::new(Axis::Vertical)
             .padding(20)
             .spacing(10)
             .push(Text::new("Iced is written in...").size(24))
             .push(Language::all().iter().cloned().fold(
-                Column::new().padding(10).spacing(20),
+                Block::new(Axis::Vertical).padding(10).spacing(20),
                 |choices, language| {
                     choices.push(Radio::new(
                         language,
@@ -548,7 +544,7 @@ impl<'a> Step {
     fn image(
         width: u16,
         slider: &'a mut slider::State,
-    ) -> Column<'a, StepMessage> {
+    ) -> Block<'a, StepMessage> {
         Self::container("Image")
             .push(Text::new("An image that tries to keep its aspect ratio."))
             .push(ferris(width))
@@ -565,7 +561,7 @@ impl<'a> Step {
             )
     }
 
-    fn scrollable() -> Column<'a, StepMessage> {
+    fn scrollable() -> Block<'a, StepMessage> {
         Self::container("Scrollable")
             .push(Text::new(
                 "Iced supports scrollable content. Try it out! Find the \
@@ -577,14 +573,14 @@ impl<'a> Step {
                 )
                 .size(16),
             )
-            .push(Column::new().height(Length::Units(4096)))
+            .push(Block::new(Axis::Vertical).height(Length::Units(4096)))
             .push(
                 Text::new("You are halfway there!")
                     .width(Length::Fill)
                     .size(30)
                     .horizontal_alignment(HorizontalAlignment::Center),
             )
-            .push(Column::new().height(Length::Units(4096)))
+            .push(Block::new(Axis::Vertical).height(Length::Units(4096)))
             .push(ferris(300))
             .push(
                 Text::new("You made it!")
@@ -598,7 +594,7 @@ impl<'a> Step {
         value: &str,
         is_secure: bool,
         state: &'a mut text_input::State,
-    ) -> Column<'a, StepMessage> {
+    ) -> Block<'a, StepMessage> {
         let text_input = TextInput::new(
             state,
             "Type something to continue...",
@@ -636,7 +632,7 @@ impl<'a> Step {
             )
     }
 
-    fn debugger(debug: bool) -> Column<'a, StepMessage> {
+    fn debugger(debug: bool) -> Block<'a, StepMessage> {
         Self::container("Debugger")
             .push(Text::new(
                 "You can ask Iced to visually explain the layouting of the \
@@ -662,7 +658,7 @@ impl<'a> Step {
             .push(Text::new("Feel free to go back and take a look."))
     }
 
-    fn end() -> Column<'a, StepMessage> {
+    fn end() -> Block<'a, StepMessage> {
         Self::container("You reached the end!")
             .push(Text::new(
                 "This tour will be updated as more features are added.",

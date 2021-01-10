@@ -1,7 +1,4 @@
-use iced::{
-    button, executor, Align, Application, Button, Column, Command, Container,
-    Element, Length, ProgressBar, Settings, Subscription, Text,
-};
+use iced::{Align ,Text ,Subscription ,Settings ,ProgressBar ,Length ,Element ,Container ,Command ,Button ,Block ,Axis ,Application ,button, executor};
 
 mod download;
 
@@ -103,7 +100,7 @@ impl Application for Example {
                     .on_press(Message::Download)
                     .into()
             }
-            Example::Finished { button } => Column::new()
+            Example::Finished { button } => Block::new(Axis::Vertical)
                 .spacing(10)
                 .align_items(Align::Center)
                 .push(Text::new("Download finished!"))
@@ -116,7 +113,7 @@ impl Application for Example {
                 Text::new(format!("Downloading... {:.2}%", current_progress))
                     .into()
             }
-            Example::Errored { button } => Column::new()
+            Example::Errored { button } => Block::new(Axis::Vertical)
                 .spacing(10)
                 .align_items(Align::Center)
                 .push(Text::new("Something went wrong :("))
@@ -127,7 +124,7 @@ impl Application for Example {
                 .into(),
         };
 
-        let content = Column::new()
+        let content = Block::new(Axis::Vertical)
             .spacing(10)
             .padding(10)
             .align_items(Align::Center)

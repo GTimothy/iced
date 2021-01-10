@@ -74,7 +74,7 @@ pub use debug::Debug;
 pub use element::Element;
 pub use event::Event;
 pub use hasher::Hasher;
-pub use layout::Layout;
+pub use layout::{Layout, flex::Axis};
 pub use overlay::Overlay;
 pub use program::Program;
 pub use renderer::Renderer;

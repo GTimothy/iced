@@ -108,12 +108,12 @@ Now, let's show the actual counter by putting it all together in our
 __view logic__:
 
 ```rust
-use iced::{Button, Column, Text};
+use iced::{Axis, Button, Block, Text};
 
 impl Counter {
-    pub fn view(&mut self) -> Column<Message> {
+    pub fn view(&mut self) -> Block<Message> {
         // We use a column: a simple vertical layout
-        Column::new()
+        Block::new(Axis::Vertical)
             .push(
                 // The increment button. We tell it to produce an
                 // `IncrementPressed` message when pressed

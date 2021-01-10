@@ -144,7 +144,7 @@ where
         } = menu;
 
         let container =
-            Container::new(Scrollable::new(&mut state.scrollable).push(List {
+            Container::new(Scrollable::new(&mut state.scrollable, layout::flex::Axis::Vertical).push(List {
                 options,
                 hovered_option,
                 last_selection,

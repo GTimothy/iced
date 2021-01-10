@@ -1,4 +1,4 @@
-//! Distribute content horizontally.
+//! Distribute content horizontally or vertically.
 use crate::event::{self, Event};
 use crate::layout;
 use crate::overlay;
@@ -9,9 +9,9 @@ use crate::{
 use std::hash::Hash;
 use std::u32;
 
-/// A container that distributes its contents horizontally.
+/// A container that distributes its contents horizontally/vertically.
 #[allow(missing_debug_implementations)]
-pub struct Row<'a, Message, Renderer> {
+pub struct Block<'a, Message, Renderer, > {
     spacing: u16,
     padding: u16,
     width: Length,
@@ -20,19 +20,18 @@ pub struct Row<'a, Message, Renderer> {
     max_height: u32,
     align_items: Align,
     children: Vec<Element<'a, Message, Renderer>>,
+    layout:layout::flex::Axis
 }
 
-impl<'a, Message, Renderer> Row<'a, Message, Renderer> {
-    /// Creates an empty [`Row`].
-    pub fn new() -> Self {
-        Self::with_children(Vec::new())
+impl<'a, Message, Renderer> Block<'a, Message, Renderer> {
+    /// Creates an empty [`Block`].
+    pub fn new(layout:layout::flex::Axis) -> Self {
+        Self::with_children(Vec::new(), layout)
     }
 
-    /// Creates a [`Row`] with the given elements.
-    pub fn with_children(
-        children: Vec<Element<'a, Message, Renderer>>,
-    ) -> Self {
-        Row {
+    /// Creates a [`Column`] with the given elements.
+    pub fn with_children( children: Vec<Element<'a, Message, Renderer>>,layout:layout::flex::Axis) -> Self {
+        Block {
             spacing: 0,
             padding: 0,
             width: Length::Shrink,
@@ -41,10 +40,10 @@ impl<'a, Message, Renderer> Row<'a, Message, Renderer> {
             max_height: u32::MAX,
             align_items: Align::Start,
             children,
+            layout
         }
     }
-
-    /// Sets the horizontal spacing _between_ elements.
+    /// Sets the vertical spacing _between_ elements.
     ///
     /// Custom margins per element do not exist in Iced. You should use this
     /// method instead! While less flexible, it helps you keep spacing between
@@ -54,43 +53,43 @@ impl<'a, Message, Renderer> Row<'a, Message, Renderer> {
         self
     }
 
-    /// Sets the padding of the [`Row`].
+    /// Sets the padding of the [`Block`].
     pub fn padding(mut self, units: u16) -> Self {
         self.padding = units;
         self
     }
 
-    /// Sets the width of the [`Row`].
+    /// Sets the width of the [`Block`].
     pub fn width(mut self, width: Length) -> Self {
         self.width = width;
         self
     }
 
-    /// Sets the height of the [`Row`].
+    /// Sets the height of the [`Block`].
     pub fn height(mut self, height: Length) -> Self {
         self.height = height;
         self
     }
 
-    /// Sets the maximum width of the [`Row`].
+    /// Sets the maximum width of the [`Block`].
     pub fn max_width(mut self, max_width: u32) -> Self {
         self.max_width = max_width;
         self
     }
 
-    /// Sets the maximum height of the [`Row`].
+    /// Sets the maximum height of the [`Block`] in pixels.
     pub fn max_height(mut self, max_height: u32) -> Self {
         self.max_height = max_height;
         self
     }
 
-    /// Sets the vertical alignment of the contents of the [`Row`] .
+    /// Sets the horizontal alignment of the contents of the [`Block`] .
     pub fn align_items(mut self, align: Align) -> Self {
         self.align_items = align;
         self
     }
 
-    /// Adds an [`Element`] to the [`Row`].
+    /// Adds an element to the [`Block`].
     pub fn push<E>(mut self, child: E) -> Self
     where
         E: Into<Element<'a, Message, Renderer>>,
@@ -101,7 +100,7 @@ impl<'a, Message, Renderer> Row<'a, Message, Renderer> {
 }
 
 impl<'a, Message, Renderer> Widget<Message, Renderer>
-    for Row<'a, Message, Renderer>
+    for Block<'a, Message, Renderer>
 where
     Renderer: self::Renderer,
 {
@@ -125,7 +124,7 @@ where
             .height(self.height);
 
         layout::flex::resolve(
-            layout::flex::Axis::Horizontal,
+            self.layout,
             renderer,
             &limits,
             self.padding as f32,
@@ -206,18 +205,18 @@ where
     }
 }
 
-/// The renderer of a [`Row`].
+/// The renderer of a [`Block`].
 ///
 /// Your [renderer] will need to implement this trait before being
-/// able to use a [`Row`] in your user interface.
+/// able to use a [`Block`] in your user interface.
 ///
 /// [renderer]: crate::renderer
 pub trait Renderer: crate::Renderer + Sized {
-    /// Draws a [`Row`].
+    /// Draws a [`Block`].
     ///
     /// It receives:
-    /// - the children of the [`Row`]
-    /// - the [`Layout`] of the [`Row`] and its children
+    /// - the children of the [`Block`]
+    /// - the [`Layout`] of the [`Block`] and its children
     /// - the cursor position
     fn draw<Message>(
         &mut self,
@@ -229,13 +228,15 @@ pub trait Renderer: crate::Renderer + Sized {
     ) -> Self::Output;
 }
 
-impl<'a, Message, Renderer> From<Row<'a, Message, Renderer>>
+impl<'a, Message, Renderer> From<Block<'a, Message, Renderer>>
     for Element<'a, Message, Renderer>
 where
     Renderer: 'a + self::Renderer,
     Message: 'a,
 {
-    fn from(row: Row<'a, Message, Renderer>) -> Element<'a, Message, Renderer> {
-        Element::new(row)
+    fn from(
+        block: Block<'a, Message, Renderer>,
+    ) -> Element<'a, Message, Renderer> {
+        Element::new(block)
     }
 }

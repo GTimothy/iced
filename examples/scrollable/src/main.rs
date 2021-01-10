@@ -1,9 +1,6 @@
 mod style;
 
-use iced::{
-    scrollable, Column, Container, Element, Length, Radio, Row, Rule, Sandbox,
-    Scrollable, Settings, Space, Text,
-};
+use iced::{Axis ,Text ,Space ,Settings ,Scrollable ,Sandbox ,Rule ,Radio ,Length ,Element ,Container ,Block ,scrollable};
 
 pub fn main() -> iced::Result {
     ScrollableDemo::run(Settings::default())
@@ -45,7 +42,7 @@ impl Sandbox for ScrollableDemo {
         } = self;
 
         let choose_theme = style::Theme::ALL.iter().fold(
-            Column::new().spacing(10).push(Text::new("Choose a theme:")),
+            Block::new(Axis::Vertical).spacing(10).push(Text::new("Choose a theme:")),
             |column, option| {
                 column.push(
                     Radio::new(
@@ -59,11 +56,11 @@ impl Sandbox for ScrollableDemo {
             },
         );
 
-        let scrollable_row = Row::with_children(
+        let scrollable_row = Block::with_children(
             variants
                 .iter_mut()
                 .map(|variant| {
-                    let mut scrollable = Scrollable::new(&mut variant.state)
+                    let mut scrollable = Scrollable::new(&mut variant.state, Axis::Vertical)
                         .padding(10)
                         .width(Length::Fill)
                         .height(Length::Fill)
@@ -117,12 +114,13 @@ impl Sandbox for ScrollableDemo {
                         .into()
                 })
                 .collect(),
+                Axis::Horizontal
         )
         .spacing(20)
         .width(Length::Fill)
         .height(Length::Fill);
 
-        let content = Column::new()
+        let content = Block::new(Axis::Vertical)
             .spacing(20)
             .padding(20)
             .push(choose_theme)

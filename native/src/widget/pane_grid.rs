@@ -32,7 +32,7 @@ use crate::event::{self, Event};
 use crate::layout;
 use crate::mouse;
 use crate::overlay;
-use crate::row;
+use crate::block;
 use crate::{
     Clipboard, Element, Hasher, Layout, Length, Point, Rectangle, Size, Vector,
     Widget,
@@ -638,7 +638,7 @@ pub trait Renderer: crate::Renderer + container::Renderer + Sized {
 impl<'a, Message, Renderer> From<PaneGrid<'a, Message, Renderer>>
     for Element<'a, Message, Renderer>
 where
-    Renderer: 'a + self::Renderer + row::Renderer,
+    Renderer: 'a + self::Renderer + block::Renderer,
     Message: 'a,
 {
     fn from(

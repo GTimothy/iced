@@ -1,7 +1,5 @@
-use iced::{
-    executor, Align, Application, Checkbox, Column, Command, Container,
-    Element, Length, Settings, Subscription, Text,
-};
+use iced::{Align ,Text ,Subscription ,Settings ,Length ,Element ,Container ,Command ,Checkbox ,Block ,Axis ,Application ,executor};
+
 
 pub fn main() -> iced::Result {
     Events::run(Settings::default())
@@ -59,7 +57,7 @@ impl Application for Events {
 
     fn view(&mut self) -> Element<Message> {
         let events = self.last.iter().fold(
-            Column::new().spacing(10),
+            Block::new(Axis::Vertical).spacing(10),
             |column, event| {
                 column.push(Text::new(format!("{:?}", event)).size(40))
             },
@@ -71,7 +69,7 @@ impl Application for Events {
             Message::Toggled,
         );
 
-        let content = Column::new()
+        let content = Block::new(Axis::Vertical)
             .align_items(Align::Center)
             .spacing(20)
             .push(events)

@@ -1,12 +1,12 @@
 //! Navigate an endless amount of content with a scrollbar.
-use crate::column;
+use crate::block;
 use crate::event::{self, Event};
 use crate::layout;
 use crate::mouse;
 use crate::overlay;
 use crate::touch;
 use crate::{
-    Align, Clipboard, Column, Element, Hasher, Layout, Length, Point,
+    Align, Block, Clipboard, Element, Hasher, Layout, Length, Point,
     Rectangle, Size, Vector, Widget,
 };
 
@@ -22,13 +22,13 @@ pub struct Scrollable<'a, Message, Renderer: self::Renderer> {
     scrollbar_width: u16,
     scrollbar_margin: u16,
     scroller_width: u16,
-    content: Column<'a, Message, Renderer>,
+    content: Block<'a, Message, Renderer>,
     style: Renderer::Style,
 }
 
 impl<'a, Message, Renderer: self::Renderer> Scrollable<'a, Message, Renderer> {
     /// Creates a new [`Scrollable`] with the given [`State`].
-    pub fn new(state: &'a mut State) -> Self {
+    pub fn new(state: &'a mut State, layout: layout::flex::Axis) -> Self {
         Scrollable {
             state,
             height: Length::Shrink,
@@ -36,7 +36,7 @@ impl<'a, Message, Renderer: self::Renderer> Scrollable<'a, Message, Renderer> {
             scrollbar_width: 10,
             scrollbar_margin: 0,
             scroller_width: 10,
-            content: Column::new(),
+            content: Block::new(layout),
             style: Renderer::Style::default(),
         }
     }
@@ -543,7 +543,7 @@ pub struct Scroller {
 /// able to use a [`Scrollable`] in your user interface.
 ///
 /// [renderer]: crate::renderer
-pub trait Renderer: column::Renderer + Sized {
+pub trait Renderer: block::Renderer + Sized {
     /// The style supported by this renderer.
     type Style: Default;
 

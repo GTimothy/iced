@@ -1,7 +1,5 @@
 //! This example showcases an interactive `Canvas` for drawing Bézier curves.
-use iced::{
-    button, Align, Button, Column, Element, Length, Sandbox, Settings, Text,
-};
+use iced::{Align ,Text ,Settings ,Sandbox ,Length ,Element ,Button ,Block ,Axis ,button};
 
 pub fn main() -> iced::Result {
     Example::run(Settings {
@@ -48,7 +46,7 @@ impl Sandbox for Example {
     }
 
     fn view(&mut self) -> Element<Message> {
-        Column::new()
+        Block::new(Axis::Vertical)
             .padding(20)
             .spacing(20)
             .align_items(Align::Center)

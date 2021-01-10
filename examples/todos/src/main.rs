@@ -1,8 +1,4 @@
-use iced::{
-    button, scrollable, text_input, Align, Application, Button, Checkbox,
-    Column, Command, Container, Element, Font, HorizontalAlignment, Length,
-    Row, Scrollable, Settings, Text, TextInput,
-};
+use iced::{Align, TextInput, Text, Settings, Scrollable, Length, HorizontalAlignment, Font, Element, Container, Command, Checkbox, Button, Block, Axis, Application, button, scrollable, text_input};
 use serde::{Deserialize, Serialize};
 
 pub fn main() -> iced::Result {
@@ -172,7 +168,7 @@ impl Application for Todos {
                         .iter_mut()
                         .enumerate()
                         .filter(|(_, task)| filter.matches(task))
-                        .fold(Column::new().spacing(20), |column, (i, task)| {
+                        .fold(Block::new(Axis::Vertical).spacing(20), |column, (i, task)| {
                             column.push(task.view().map(move |message| {
                                 Message::TaskMessage(i, message)
                             }))
@@ -188,7 +184,7 @@ impl Application for Todos {
                     })
                 };
 
-                let content = Column::new()
+                let content = Block::new(Axis::Vertical)
                     .max_width(800)
                     .spacing(20)
                     .push(title)
@@ -196,7 +192,7 @@ impl Application for Todos {
                     .push(controls)
                     .push(tasks);
 
-                Scrollable::new(scroll)
+                Scrollable::new(scroll, Axis::Vertical)
                     .padding(40)
                     .push(
                         Container::new(content).width(Length::Fill).center_x(),
@@ -290,7 +286,7 @@ impl Task {
                 )
                 .width(Length::Fill);
 
-                Row::new()
+                Block::new(Axis::Horizontal)
                     .spacing(20)
                     .align_items(Align::Center)
                     .push(checkbox)
@@ -315,14 +311,14 @@ impl Task {
                 .on_submit(TaskMessage::FinishEdition)
                 .padding(10);
 
-                Row::new()
+                Block::new(Axis::Horizontal)
                     .spacing(20)
                     .align_items(Align::Center)
                     .push(text_input)
                     .push(
                         Button::new(
                             delete_button,
-                            Row::new()
+                            Block::new(Axis::Horizontal)
                                 .spacing(10)
                                 .push(delete_icon())
                                 .push(Text::new("Delete")),
@@ -345,7 +341,7 @@ pub struct Controls {
 }
 
 impl Controls {
-    fn view(&mut self, tasks: &[Task], current_filter: Filter) -> Row<Message> {
+    fn view(&mut self, tasks: &[Task], current_filter: Filter) -> Block<Message> {
         let Controls {
             all_button,
             active_button,
@@ -364,7 +360,7 @@ impl Controls {
             button.on_press(Message::FilterChanged(filter)).padding(8)
         };
 
-        Row::new()
+        Block::new(Axis::Horizontal)
             .spacing(20)
             .align_items(Align::Center)
             .push(
@@ -377,7 +373,7 @@ impl Controls {
                 .size(16),
             )
             .push(
-                Row::new()
+                Block::new(Axis::Horizontal)
                     .width(Length::Shrink)
                     .spacing(10)
                     .push(filter_button(

@@ -19,16 +19,15 @@
 //! ```
 //!
 //! [renderer]: crate::renderer
+pub mod block;
 pub mod button;
 pub mod checkbox;
-pub mod column;
 pub mod container;
 pub mod image;
 pub mod pane_grid;
 pub mod pick_list;
 pub mod progress_bar;
 pub mod radio;
-pub mod row;
 pub mod rule;
 pub mod scrollable;
 pub mod slider;
@@ -38,11 +37,11 @@ pub mod text;
 pub mod text_input;
 
 #[doc(no_inline)]
+pub use block::Block;
+#[doc(no_inline)]
 pub use button::Button;
 #[doc(no_inline)]
 pub use checkbox::Checkbox;
-#[doc(no_inline)]
-pub use column::Column;
 #[doc(no_inline)]
 pub use container::Container;
 #[doc(no_inline)]
@@ -55,8 +54,6 @@ pub use pick_list::PickList;
 pub use progress_bar::ProgressBar;
 #[doc(no_inline)]
 pub use radio::Radio;
-#[doc(no_inline)]
-pub use row::Row;
 #[doc(no_inline)]
 pub use rule::Rule;
 #[doc(no_inline)]

@@ -1,5 +1,5 @@
 //! Navigate an endless amount of content with a scrollbar.
-use crate::{bumpalo, css, Align, Bus, Column, Css, Element, Length, Widget};
+use crate::{bumpalo, css, Align, Bus, Block, Css, Element, Length, Widget};
 
 pub use iced_style::scrollable::{Scrollbar, Scroller, StyleSheet};
 
@@ -10,20 +10,20 @@ pub struct Scrollable<'a, Message> {
     width: Length,
     height: Length,
     max_height: u32,
-    content: Column<'a, Message>,
+    content: Block<'a, Message>,
     style: Box<dyn StyleSheet>,
 }
 
 impl<'a, Message> Scrollable<'a, Message> {
     /// Creates a new [`Scrollable`] with the given [`State`].
-    pub fn new(_state: &'a mut State) -> Self {
+    pub fn new(_state: &'a mut State, layout: css::Layout) -> Self {
         use std::u32;
 
         Scrollable {
             width: Length::Fill,
             height: Length::Shrink,
             max_height: u32::MAX,
-            content: Column::new(),
+            content: Block::new(layout),
             style: Default::default(),
         }
     }

@@ -160,10 +160,7 @@ mod rainbow {
     }
 }
 
-use iced::{
-    scrollable, Align, Column, Container, Element, Length, Sandbox, Scrollable,
-    Settings, Text,
-};
+use iced::{Align ,Text ,Settings ,Scrollable ,Sandbox ,Length ,Element ,Container ,Block ,Axis ,scrollable};
 use rainbow::Rainbow;
 
 pub fn main() -> iced::Result {
@@ -190,7 +187,7 @@ impl Sandbox for Example {
     fn update(&mut self, _: ()) {}
 
     fn view(&mut self) -> Element<()> {
-        let content = Column::new()
+        let content = Block::new(Axis::Vertical)
             .padding(20)
             .spacing(20)
             .max_width(500)
@@ -211,7 +208,7 @@ impl Sandbox for Example {
                  geometry for your widget.",
             ));
 
-        let scrollable = Scrollable::new(&mut self.scroll)
+        let scrollable = Scrollable::new(&mut self.scroll, Axis::Vertical)
             .push(Container::new(content).width(Length::Fill).center_x());
 
         Container::new(scrollable)

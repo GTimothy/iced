@@ -4,12 +4,12 @@ use std::hash::Hash;
 use crate::event::{self, Event};
 use crate::layout;
 use crate::mouse;
-use crate::row;
+use crate::block;
 use crate::text;
 use crate::touch;
 use crate::{
-    Align, Clipboard, Element, Hasher, HorizontalAlignment, Layout, Length,
-    Point, Rectangle, Row, Text, VerticalAlignment, Widget,
+    Align, Block, Clipboard, Element, Hasher, HorizontalAlignment, Layout, Length,
+    Point, Rectangle, Text, VerticalAlignment, Widget,
 };
 
 /// A box that can be checked.
@@ -112,7 +112,7 @@ impl<Message, Renderer: self::Renderer + text::Renderer>
 impl<Message, Renderer> Widget<Message, Renderer>
     for Checkbox<Message, Renderer>
 where
-    Renderer: self::Renderer + text::Renderer + row::Renderer,
+    Renderer: self::Renderer + text::Renderer + block::Renderer,
 {
     fn width(&self) -> Length {
         self.width
@@ -127,12 +127,12 @@ where
         renderer: &Renderer,
         limits: &layout::Limits,
     ) -> layout::Node {
-        Row::<(), Renderer>::new()
+        Block::<(), Renderer>::new(layout::flex::Axis::Horizontal)
             .width(self.width)
             .spacing(self.spacing)
             .align_items(Align::Center)
             .push(
-                Row::new()
+                Block::new(layout::flex::Axis::Horizontal)
                     .width(Length::Units(self.size))
                     .height(Length::Units(self.size)),
             )
@@ -254,7 +254,7 @@ pub trait Renderer: crate::Renderer {
 impl<'a, Message, Renderer> From<Checkbox<Message, Renderer>>
     for Element<'a, Message, Renderer>
 where
-    Renderer: 'a + self::Renderer + text::Renderer + row::Renderer,
+    Renderer: 'a + self::Renderer + text::Renderer + block::Renderer,
     Message: 'a,
 {
     fn from(

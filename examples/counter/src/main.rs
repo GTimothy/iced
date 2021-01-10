@@ -1,4 +1,4 @@
-use iced::{button, Align, Button, Column, Element, Sandbox, Settings, Text};
+use iced::{button, Align, Axis, Button, Block, Element, Sandbox, Settings, Text};
 
 pub fn main() -> iced::Result {
     Counter::run(Settings::default())
@@ -40,7 +40,7 @@ impl Sandbox for Counter {
     }
 
     fn view(&mut self) -> Element<Message> {
-        Column::new()
+        Block::new(Axis::Vertical)
             .padding(20)
             .align_items(Align::Center)
             .push(

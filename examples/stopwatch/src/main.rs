@@ -1,8 +1,4 @@
-use iced::{
-    button, executor, time, Align, Application, Button, Column, Command,
-    Container, Element, HorizontalAlignment, Length, Row, Settings,
-    Subscription, Text,
-};
+use iced::{Align ,Text ,Subscription ,Settings ,Length ,HorizontalAlignment ,Element ,Container ,Command ,Button ,Block ,Axis ,Application ,button, executor, time};
 use std::time::{Duration, Instant};
 
 pub fn main() -> iced::Result {
@@ -124,12 +120,12 @@ impl Application for Stopwatch {
             button(&mut self.reset, "Reset", style::Button::Secondary)
                 .on_press(Message::Reset);
 
-        let controls = Row::new()
+        let controls = Block::new(Axis::Horizontal)
             .spacing(20)
             .push(toggle_button)
             .push(reset_button);
 
-        let content = Column::new()
+        let content = Block::new(Axis::Vertical)
             .align_items(Align::Center)
             .spacing(20)
             .push(duration)

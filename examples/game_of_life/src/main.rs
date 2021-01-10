@@ -10,8 +10,8 @@ use iced::pick_list::{self, PickList};
 use iced::slider::{self, Slider};
 use iced::time;
 use iced::{
-    Align, Application, Checkbox, Column, Command, Container, Element, Length,
-    Row, Settings, Subscription, Text,
+    Align, Application, Axis, Block, Checkbox, Command, Container, Element, Length, 
+    Settings, Subscription, Text,
 };
 use preset::Preset;
 use std::time::{Duration, Instant};
@@ -134,7 +134,7 @@ impl Application for GameOfLife {
             self.grid.preset(),
         );
 
-        let content = Column::new()
+        let content = Block::new(Axis::Vertical)
             .push(
                 self.grid
                     .view()
@@ -821,7 +821,7 @@ impl Controls {
         speed: usize,
         preset: Preset,
     ) -> Element<'a, Message> {
-        let playback_controls = Row::new()
+        let playback_controls = Block::new(Axis::Horizontal)
             .spacing(10)
             .push(
                 Button::new(
@@ -837,7 +837,7 @@ impl Controls {
                     .style(style::Button),
             );
 
-        let speed_controls = Row::new()
+        let speed_controls = Block::new(Axis::Horizontal)
             .width(Length::Fill)
             .align_items(Align::Center)
             .spacing(10)
@@ -852,7 +852,7 @@ impl Controls {
             )
             .push(Text::new(format!("x{}", speed)).size(16));
 
-        Row::new()
+        Block::new(Axis::Horizontal)
             .padding(10)
             .spacing(20)
             .align_items(Align::Center)

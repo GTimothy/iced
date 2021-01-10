@@ -1,6 +1,6 @@
 use iced::{
-    button, scrollable, slider, text_input, Align, Button, Checkbox, Column,
-    Container, Element, Length, ProgressBar, Radio, Row, Rule, Sandbox,
+    button, scrollable, slider, text_input, Align, Axis, Button, Checkbox, Block,
+    Container, Element, Length, ProgressBar, Radio, Rule, Sandbox,
     Scrollable, Settings, Slider, Space, Text, TextInput,
 };
 
@@ -52,7 +52,7 @@ impl Sandbox for Styling {
 
     fn view(&mut self) -> Element<Message> {
         let choose_theme = style::Theme::ALL.iter().fold(
-            Column::new().spacing(10).push(Text::new("Choose a theme:")),
+            Block::new(Axis::Vertical).spacing(10).push(Text::new("Choose a theme:")),
             |column, theme| {
                 column.push(
                     Radio::new(
@@ -92,7 +92,7 @@ impl Sandbox for Styling {
         let progress_bar =
             ProgressBar::new(0.0..=100.0, self.slider_value).style(self.theme);
 
-        let scrollable = Scrollable::new(&mut self.scroll)
+        let scrollable = Scrollable::new(&mut self.scroll, Axis::Vertical)
             .width(Length::Fill)
             .height(Length::Units(100))
             .style(self.theme)
@@ -108,17 +108,17 @@ impl Sandbox for Styling {
         .width(Length::Fill)
         .style(self.theme);
 
-        let content = Column::new()
+        let content = Block::new(Axis::Vertical)
             .spacing(20)
             .padding(20)
             .max_width(600)
             .push(choose_theme)
             .push(Rule::horizontal(38).style(self.theme))
-            .push(Row::new().spacing(10).push(text_input).push(button))
+            .push(Block::new(Axis::Horizontal).spacing(10).push(text_input).push(button))
             .push(slider)
             .push(progress_bar)
             .push(
-                Row::new()
+                Block::new(Axis::Horizontal)
                     .spacing(10)
                     .height(Length::Units(100))
                     .align_items(Align::Center)

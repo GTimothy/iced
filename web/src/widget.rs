@@ -25,8 +25,7 @@ pub mod scrollable;
 pub mod slider;
 pub mod text_input;
 
-mod column;
-mod row;
+mod block;
 mod space;
 mod text;
 
@@ -41,13 +40,12 @@ pub use text::Text;
 #[doc(no_inline)]
 pub use text_input::TextInput;
 
+pub use block::Block;
 pub use checkbox::Checkbox;
-pub use column::Column;
 pub use container::Container;
 pub use image::Image;
 pub use progress_bar::ProgressBar;
 pub use radio::Radio;
-pub use row::Row;
 pub use space::Space;
 
 /// A component that displays information and allows interaction.

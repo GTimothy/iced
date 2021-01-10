@@ -95,12 +95,12 @@
 //! #     DecrementPressed,
 //! # }
 //! #
-//! use iced::{Button, Column, Text};
+//! use iced::{Axis, Button, Block, Text};
 //!
 //! impl Counter {
-//!     pub fn view(&mut self) -> Column<Message> {
+//!     pub fn view(&mut self) -> Block<Message> {
 //!         // We use a column: a simple vertical layout
-//!         Column::new()
+//!         Block::new(Axis::Vertical)
 //!             .push(
 //!                 // The increment button. We tell it to produce an
 //!                 // `IncrementPressed` message when pressed
@@ -239,6 +239,6 @@ pub use sandbox::Sandbox;
 pub use settings::Settings;
 
 pub use runtime::{
-    futures, Align, Background, Color, Command, Font, HorizontalAlignment,
-    Length, Point, Rectangle, Size, Subscription, Vector, VerticalAlignment,
+    futures, Align, Axis, Background, Color, Command, Font, HorizontalAlignment,
+    Length, Point, Rectangle, Size, Subscription, Vector, VerticalAlignment
 };

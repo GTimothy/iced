@@ -104,14 +104,14 @@ where
     /// # pub enum Message {
     /// #    Counter(usize, counter::Message)
     /// # }
-    /// use iced_native::{Element, Row};
+    /// use iced_native::{Element, Block};
     /// use iced_wgpu::Renderer;
     ///
     /// impl ManyCounters {
-    ///     pub fn view(&mut self) -> Row<Message, Renderer> {
+    ///     pub fn view(&mut self) -> Block<Message, Renderer> {
     ///         // We can quickly populate a `Row` by folding over our counters
     ///         self.counters.iter_mut().enumerate().fold(
-    ///             Row::new().spacing(20),
+    ///             Block::new().spacing(20),
     ///             |row, (index, counter)| {
     ///                 // We display the counter
     ///                 let element: Element<counter::Message, Renderer> =
