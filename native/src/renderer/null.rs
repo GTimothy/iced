@@ -1,6 +1,6 @@
 use crate::{
     block, button, checkbox, container, pane_grid, progress_bar, radio,
-    scrollable, slider, text, text_input, Color, Element, Font,
+    scrollable, slider, text, text_input, Axis, Color, Element, Font,
     HorizontalAlignment, Layout, Point, Rectangle, Renderer, Size,
     VerticalAlignment,
 };
@@ -80,6 +80,7 @@ impl scrollable::Renderer for Null {
         _scrollbar_width: u16,
         _scrollbar_margin: u16,
         _scroller_width: u16,
+        _axis: Axis,
     ) -> Option<scrollable::Scrollbar> {
         None
     }

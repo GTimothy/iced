@@ -6,7 +6,7 @@ use crate::mouse;
 use crate::overlay;
 use crate::touch;
 use crate::{
-    Align, Block, Clipboard, Element, Hasher, Layout, Length, Point,
+    Align, Axis, Block, Clipboard, Element, Hasher, Layout, Length, Point,
     Rectangle, Size, Vector, Widget,
 };
 
@@ -18,26 +18,32 @@ use std::{f32, hash::Hash, u32};
 pub struct Scrollable<'a, Message, Renderer: self::Renderer> {
     state: &'a mut State,
     height: Length,
+    width: Length,
     max_height: u32,
+    max_width: u32,
     scrollbar_width: u16,
     scrollbar_margin: u16,
     scroller_width: u16,
     content: Block<'a, Message, Renderer>,
     style: Renderer::Style,
+    axis: Axis,
 }
 
 impl<'a, Message, Renderer: self::Renderer> Scrollable<'a, Message, Renderer> {
     /// Creates a new [`Scrollable`] with the given [`State`].
-    pub fn new(state: &'a mut State, layout: layout::flex::Axis) -> Self {
+    pub fn new(state: &'a mut State, axis: Axis) -> Self {
         Scrollable {
             state,
             height: Length::Shrink,
+            width: Length::Shrink,
             max_height: u32::MAX,
+            max_width: u32::MAX,
             scrollbar_width: 10,
             scrollbar_margin: 0,
             scroller_width: 10,
-            content: Block::new(layout),
+            content: Block::new(axis),
             style: Renderer::Style::default(),
+            axis,
         }
     }
 
@@ -59,25 +65,41 @@ impl<'a, Message, Renderer: self::Renderer> Scrollable<'a, Message, Renderer> {
 
     /// Sets the width of the [`Scrollable`].
     pub fn width(mut self, width: Length) -> Self {
-        self.content = self.content.width(width);
+        match self.axis {
+            Axis::Horizontal => self.content = self.content.width(width),
+            Axis::Vertical => self.width = width,
+        }
         self
     }
 
     /// Sets the height of the [`Scrollable`].
     pub fn height(mut self, height: Length) -> Self {
-        self.height = height;
+        match self.axis {
+            Axis::Horizontal => self.height = height,
+            Axis::Vertical => self.content = self.content.height(height),
+        }
         self
     }
 
     /// Sets the maximum width of the [`Scrollable`].
     pub fn max_width(mut self, max_width: u32) -> Self {
-        self.content = self.content.max_width(max_width);
+        match self.axis {
+            Axis::Horizontal => {
+                self.content = self.content.max_width(max_width)
+            }
+            Axis::Vertical => self.max_width = max_width,
+        }
         self
     }
 
     /// Sets the maximum height of the [`Scrollable`] in pixels.
     pub fn max_height(mut self, max_height: u32) -> Self {
-        self.max_height = max_height;
+        match self.axis {
+            Axis::Horizontal => self.max_height = max_height,
+            Axis::Vertical => {
+                self.content = self.content.max_height(max_height)
+            }
+        }
         self
     }
 
@@ -129,11 +151,19 @@ where
     Renderer: self::Renderer,
 {
     fn width(&self) -> Length {
-        Widget::<Message, Renderer>::width(&self.content)
+        match self.axis {
+            Axis::Horizontal => self.width,
+            Axis::Vertical => Widget::<Message, Renderer>::width(&self.content),
+        }
     }
 
     fn height(&self) -> Length {
-        self.height
+        match self.axis {
+            Axis::Horizontal => {
+                Widget::<Message, Renderer>::height(&self.content)
+            }
+            Axis::Vertical => self.height,
+        }
     }
 
     fn layout(
@@ -143,13 +173,23 @@ where
     ) -> layout::Node {
         let limits = limits
             .max_height(self.max_height)
-            .width(Widget::<Message, Renderer>::width(&self.content))
-            .height(self.height);
+            .max_width(self.max_width)
+            .width(self.width())
+            .height(self.height());
 
         let child_limits = layout::Limits::new(
-            Size::new(limits.min().width, 0.0),
-            Size::new(limits.max().width, f32::INFINITY),
-        );
+            Size::new(0.0, 0.0),
+            match self.axis {
+                Axis::Horizontal => {
+                    Size::new(f32::INFINITY, limits.max().height)
+                }
+                Axis::Vertical => Size::new(limits.max().width, f32::INFINITY),
+            },
+        )
+        .width(Length::Shrink)
+        .height(Length::Shrink);
+
+        //TODO make sure everything is expected behaviour
 
         let content = self.content.layout(renderer, &child_limits);
         let size = limits.resolve(content.size());
@@ -172,7 +212,7 @@ where
         let content = layout.children().next().unwrap();
         let content_bounds = content.bounds();
 
-        let offset = self.state.offset(bounds, content_bounds);
+        let offset = self.state.offset(bounds, content_bounds, self.axis);
         let scrollbar = renderer.scrollbar(
             bounds,
             content_bounds,
@@ -180,6 +220,7 @@ where
             self.scrollbar_width,
             self.scrollbar_margin,
             self.scroller_width,
+            self.axis,
         );
         let is_mouse_over_scrollbar = scrollbar
             .as_ref()
@@ -187,18 +228,45 @@ where
             .unwrap_or(false);
 
         let event_status = {
-            let cursor_position = if is_mouse_over && !is_mouse_over_scrollbar {
-                Point::new(
-                    cursor_position.x,
-                    cursor_position.y
-                        + self.state.offset(bounds, content_bounds) as f32,
-                )
-            } else {
-                // TODO: Make `cursor_position` an `Option<Point>` so we can encode
-                // cursor availability.
-                // This will probably happen naturally once we add multi-window
-                // support.
-                Point::new(cursor_position.x, -1.0)
+            let cursor_position = match self.axis {
+                Axis::Vertical => {
+                    if is_mouse_over && !is_mouse_over_scrollbar {
+                        Point::new(
+                            cursor_position.x,
+                            cursor_position.y
+                                + self.state.offset(
+                                    bounds,
+                                    content_bounds,
+                                    self.axis,
+                                ) as f32,
+                        )
+                    } else {
+                        // TODO: Make `cursor_position` an `Option<Point>` so we can encode
+                        // cursor availability.
+                        // This will probably happen naturally once we add multi-window
+                        // support.
+                        Point::new(cursor_position.x, -1.0)
+                    }
+                }
+                Axis::Horizontal => {
+                    if is_mouse_over && !is_mouse_over_scrollbar {
+                        Point::new(
+                            cursor_position.x
+                                + self.state.offset(
+                                    bounds,
+                                    content_bounds,
+                                    self.axis,
+                                ) as f32,
+                            cursor_position.y,
+                        )
+                    } else {
+                        // TODO: Make `cursor_position` an `Option<Point>` so we can encode
+                        // cursor availability.
+                        // This will probably happen naturally once we add multi-window
+                        // support.
+                        Point::new(-1.0, cursor_position.y)
+                    }
+                }
             };
 
             self.content.on_event(
@@ -218,13 +286,48 @@ where
         if is_mouse_over {
             match event {
                 Event::Mouse(mouse::Event::WheelScrolled { delta }) => {
-                    match delta {
-                        mouse::ScrollDelta::Lines { y, .. } => {
-                            // TODO: Configurable speed (?)
-                            self.state.scroll(y * 60.0, bounds, content_bounds);
+                    match self.axis {
+                        Axis::Vertical => {
+                            match delta {
+                                mouse::ScrollDelta::Lines { y, .. } => {
+                                    // TODO: Configurable speed (?)
+                                    self.state.scroll(
+                                        y * 60.0,
+                                        bounds,
+                                        content_bounds,
+                                        self.axis,
+                                    );
+                                }
+                                mouse::ScrollDelta::Pixels { y, .. } => {
+                                    self.state.scroll(
+                                        y,
+                                        bounds,
+                                        content_bounds,
+                                        self.axis,
+                                    );
+                                }
+                            }
                         }
-                        mouse::ScrollDelta::Pixels { y, .. } => {
-                            self.state.scroll(y, bounds, content_bounds);
+                        Axis::Horizontal => {
+                            match delta {
+                                mouse::ScrollDelta::Lines { x, .. } => {
+                                    // TODO: Configurable speed (?)
+                                    self.state.scroll(
+                                        x * 60.0,
+                                        bounds,
+                                        content_bounds,
+                                        self.axis,
+                                    );
+                                }
+                                mouse::ScrollDelta::Pixels { x, .. } => {
+                                    self.state.scroll(
+                                        x,
+                                        bounds,
+                                        content_bounds,
+                                        self.axis,
+                                    );
+                                }
+                            }
                         }
                     }
 
@@ -240,13 +343,21 @@ where
                             if let Some(scroll_box_touched_at) =
                                 self.state.scroll_box_touched_at
                             {
-                                let delta =
-                                    cursor_position.y - scroll_box_touched_at.y;
-
+                                let delta = match self.axis {
+                                    Axis::Vertical => {
+                                        cursor_position.y
+                                            - scroll_box_touched_at.y
+                                    }
+                                    Axis::Horizontal => {
+                                        cursor_position.x
+                                            - scroll_box_touched_at.x
+                                    }
+                                };
                                 self.state.scroll(
                                     delta,
                                     bounds,
                                     content_bounds,
+                                    self.axis,
                                 );
 
                                 self.state.scroll_box_touched_at =
@@ -288,6 +399,7 @@ where
                             ),
                             bounds,
                             content_bounds,
+                            self.axis,
                         );
 
                         return event::Status::Captured;
@@ -312,6 +424,7 @@ where
                                 ),
                                 bounds,
                                 content_bounds,
+                                self.axis,
                             );
 
                             self.state.scroller_grabbed_at =
@@ -339,7 +452,7 @@ where
         let bounds = layout.bounds();
         let content_layout = layout.children().next().unwrap();
         let content_bounds = content_layout.bounds();
-        let offset = self.state.offset(bounds, content_bounds);
+        let offset = self.state.offset(bounds, content_bounds, self.axis);
         let scrollbar = renderer.scrollbar(
             bounds,
             content_bounds,
@@ -347,6 +460,7 @@ where
             self.scrollbar_width,
             self.scrollbar_margin,
             self.scroller_width,
+            self.axis,
         );
 
         let is_mouse_over = bounds.contains(cursor_position);
@@ -357,21 +471,45 @@ where
 
         let content = {
             let cursor_position = if is_mouse_over && !is_mouse_over_scrollbar {
-                Point::new(cursor_position.x, cursor_position.y + offset as f32)
+                match self.axis {
+                    Axis::Vertical => Point::new(
+                        cursor_position.x,
+                        cursor_position.y + offset as f32,
+                    ),
+                    Axis::Horizontal => Point::new(
+                        cursor_position.x + offset as f32,
+                        cursor_position.y,
+                    ),
+                }
             } else {
-                Point::new(cursor_position.x, -1.0)
+                match self.axis {
+                    Axis::Vertical => Point::new(cursor_position.x, -1.0),
+                    Axis::Horizontal => Point::new(-1.0, cursor_position.y),
+                }
             };
 
-            self.content.draw(
-                renderer,
-                defaults,
-                content_layout,
-                cursor_position,
-                &Rectangle {
-                    y: bounds.y + offset as f32,
-                    ..bounds
-                },
-            )
+            match self.axis {
+                Axis::Vertical => self.content.draw(
+                    renderer,
+                    defaults,
+                    content_layout,
+                    cursor_position,
+                    &Rectangle {
+                        y: bounds.y + offset as f32,
+                        ..bounds
+                    },
+                ),
+                Axis::Horizontal => self.content.draw(
+                    renderer,
+                    defaults,
+                    content_layout,
+                    cursor_position,
+                    &Rectangle {
+                        x: bounds.x + offset as f32,
+                        ..bounds
+                    },
+                ),
+            }
         };
 
         self::Renderer::draw(
@@ -391,10 +529,16 @@ where
     fn hash_layout(&self, state: &mut Hasher) {
         struct Marker;
         std::any::TypeId::of::<Marker>().hash(state);
-
-        self.height.hash(state);
-        self.max_height.hash(state);
-
+        match self.axis {
+            Axis::Vertical => {
+                self.height.hash(state);
+                self.max_height.hash(state);
+            }
+            Axis::Horizontal => {
+                self.width.hash(state);
+                self.max_width.hash(state);
+            }
+        };
         self.content.hash_layout(state)
     }
 
@@ -403,16 +547,23 @@ where
         layout: Layout<'_>,
     ) -> Option<overlay::Element<'_, Message, Renderer>> {
         let Self { content, state, .. } = self;
-
+        let axis = self.axis;
         content
             .overlay(layout.children().next().unwrap())
             .map(|overlay| {
                 let bounds = layout.bounds();
                 let content_layout = layout.children().next().unwrap();
                 let content_bounds = content_layout.bounds();
-                let offset = state.offset(bounds, content_bounds);
+                let offset = state.offset(bounds, content_bounds, axis);
 
-                overlay.translate(Vector::new(0.0, -(offset as f32)))
+                match axis {
+                    Axis::Vertical => {
+                        overlay.translate(Vector::new(0.0, -(offset as f32)))
+                    }
+                    Axis::Horizontal => {
+                        overlay.translate(Vector::new(-(offset as f32), 0.0))
+                    }
+                }
             })
     }
 }
@@ -435,17 +586,31 @@ impl State {
     /// the [`Scrollable`] and its contents.
     pub fn scroll(
         &mut self,
-        delta_y: f32,
+        delta: f32,
         bounds: Rectangle,
         content_bounds: Rectangle,
+        axis: Axis,
     ) {
-        if bounds.height >= content_bounds.height {
-            return;
-        }
+        match axis {
+            Axis::Vertical => {
+                if bounds.height >= content_bounds.height {
+                    return;
+                }
 
-        self.offset = (self.offset - delta_y)
-            .max(0.0)
-            .min((content_bounds.height - bounds.height) as f32);
+                self.offset = (self.offset - delta)
+                    .max(0.0)
+                    .min((content_bounds.height - bounds.height) as f32)
+            }
+            Axis::Horizontal => {
+                if bounds.width >= content_bounds.width {
+                    return;
+                }
+
+                self.offset = (self.offset - delta)
+                    .max(0.0)
+                    .min((content_bounds.width - bounds.width) as f32);
+            }
+        }
     }
 
     /// Moves the scroll position to a relative amount, given the bounds of
@@ -458,17 +623,34 @@ impl State {
         percentage: f32,
         bounds: Rectangle,
         content_bounds: Rectangle,
+        axis: Axis,
     ) {
-        self.offset =
-            ((content_bounds.height - bounds.height) * percentage).max(0.0);
+        self.offset = match axis {
+            Axis::Vertical => {
+                ((content_bounds.height - bounds.height) * percentage).max(0.0)
+            }
+            Axis::Horizontal => {
+                ((content_bounds.width - bounds.width) * percentage).max(0.0)
+            }
+        };
     }
 
     /// Returns the current scrolling offset of the [`State`], given the bounds
     /// of the [`Scrollable`] and its contents.
-    pub fn offset(&self, bounds: Rectangle, content_bounds: Rectangle) -> u32 {
-        let hidden_content =
-            (content_bounds.height - bounds.height).max(0.0).round() as u32;
-
+    pub fn offset(
+        &self,
+        bounds: Rectangle,
+        content_bounds: Rectangle,
+        axis: Axis,
+    ) -> u32 {
+        let hidden_content = match axis {
+            Axis::Vertical => {
+                (content_bounds.height - bounds.height).max(0.0).round() as u32
+            }
+            Axis::Horizontal => {
+                (content_bounds.width - bounds.width).max(0.0).round() as u32
+            }
+        };
         self.offset.min(hidden_content as f32) as u32
     }
 
@@ -488,6 +670,7 @@ impl State {
 pub struct Scrollbar {
     /// The outer bounds of the scrollable, including the [`Scrollbar`] and
     /// [`Scroller`].
+    // #[]
     pub outer_bounds: Rectangle,
 
     /// The bounds of the [`Scrollbar`].
@@ -498,6 +681,9 @@ pub struct Scrollbar {
 
     /// The bounds of the [`Scroller`].
     pub scroller: Scroller,
+
+    /// The orientation of the [`Scrollbar`]
+    pub axis: Axis,
 }
 
 impl Scrollbar {
@@ -508,8 +694,16 @@ impl Scrollbar {
     fn grab_scroller(&self, cursor_position: Point) -> Option<f32> {
         if self.outer_bounds.contains(cursor_position) {
             Some(if self.scroller.bounds.contains(cursor_position) {
-                (cursor_position.y - self.scroller.bounds.y)
-                    / self.scroller.bounds.height
+                match self.axis {
+                    Axis::Vertical => {
+                        (cursor_position.y - self.scroller.bounds.y)
+                            / self.scroller.bounds.height
+                    }
+                    Axis::Horizontal => {
+                        (cursor_position.x - self.scroller.bounds.x)
+                            / self.scroller.bounds.height
+                    }
+                }
             } else {
                 0.5
             })
@@ -523,10 +717,20 @@ impl Scrollbar {
         grabbed_at: f32,
         cursor_position: Point,
     ) -> f32 {
-        (cursor_position.y
-            - self.bounds.y
-            - self.scroller.bounds.height * grabbed_at)
-            / (self.bounds.height - self.scroller.bounds.height)
+        match self.axis {
+            Axis::Vertical => {
+                (cursor_position.y
+                    - self.bounds.y
+                    - self.scroller.bounds.height * grabbed_at)
+                    / (self.bounds.height - self.scroller.bounds.height)
+            }
+            Axis::Horizontal => {
+                (cursor_position.x
+                    - self.bounds.x
+                    - self.scroller.bounds.height * grabbed_at)
+                    / (self.bounds.width - self.scroller.bounds.height)
+            }
+        }
     }
 }
 
@@ -557,6 +761,7 @@ pub trait Renderer: block::Renderer + Sized {
         scrollbar_width: u16,
         scrollbar_margin: u16,
         scroller_width: u16,
+        axis: Axis,
     ) -> Option<Scrollbar>;
 
     /// Draws the [`Scrollable`].
