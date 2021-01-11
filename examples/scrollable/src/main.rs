@@ -129,8 +129,10 @@ impl Sandbox for ScrollableDemo {
                         .push(Text::new("The End."));
 
                     Container::new(scrollable)
+                    // Block::new(Axis::Vertical).push(scrollable)
                         .width(Length::Fill)
                         .height(Length::Fill)
+                        .center_x()
                         .style(*theme)
                         .into()
                 })

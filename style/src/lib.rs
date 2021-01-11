@@ -9,6 +9,7 @@ pub use iced_core::{Background, Color};
 pub mod button;
 pub mod checkbox;
 pub mod container;
+pub mod block;
 pub mod menu;
 pub mod pane_grid;
 pub mod pick_list;

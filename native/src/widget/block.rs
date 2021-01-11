@@ -1,4 +1,4 @@
-//! Distribute content horizontally or vertically.
+//! Decorate and distributes content horizontally/vertically and apply alignment and spacing.
 use crate::event::{self, Event};
 use crate::layout::{self, flex};
 use crate::overlay;
@@ -11,19 +11,24 @@ use std::u32;
 
 /// A container that distributes its contents horizontally/vertically.
 #[allow(missing_debug_implementations)]
-pub struct Block<'a, Message, Renderer, > {
+pub struct Block<'a, Message, Renderer: self::Renderer, > {
     spacing: u16,
     padding: u16,
     width: Length,
     height: Length,
     max_width: u32,
     max_height: u32,
-    align_items: Align,
+    horizontal_alignment: Align,
+    vertical_alignment: Align,
+    style: Renderer::Style,
     children: Vec<Element<'a, Message, Renderer>>,
     flex_axis: flex::Axis
 }
 
-impl<'a, Message, Renderer> Block<'a, Message, Renderer> {
+impl<'a, Message, Renderer> Block<'a, Message, Renderer>
+where
+    Renderer: self::Renderer,
+{
     /// Creates an empty [`Block`].
     pub fn new(flex_axis: flex::Axis) -> Self {
         Self::with_children(Vec::new(), flex_axis)
@@ -38,7 +43,9 @@ impl<'a, Message, Renderer> Block<'a, Message, Renderer> {
             height: Length::Shrink,
             max_width: u32::MAX,
             max_height: u32::MAX,
-            align_items: Align::Start,
+            horizontal_alignment: Align::Start,
+            vertical_alignment: Align::Start,
+            style: Renderer::Style::default(),
             children,
             flex_axis
         }
@@ -83,9 +90,48 @@ impl<'a, Message, Renderer> Block<'a, Message, Renderer> {
         self
     }
 
-    /// Sets the horizontal alignment of the contents of the [`Block`] .
-    pub fn align_items(mut self, align: Align) -> Self {
-        self.align_items = align;
+    /// Sets the content alignment for the horizontal axis of the [`Container`].
+    pub fn align_items(mut self, alignment: Align) -> Self {
+        match self.flex_axis {
+            crate::Axis::Horizontal => self.vertical_alignment = alignment,
+            crate::Axis::Vertical => self.horizontal_alignment = alignment
+        };
+        self
+    }
+
+    /// Sets the content alignment for the horizontal axis of the [`Container`].
+    pub fn align_x(mut self, alignment: Align) -> Self {
+        self.horizontal_alignment = alignment;
+        self
+    }
+
+    /// Sets the content alignment for the vertical axis of the [`Container`].
+    pub fn align_y(mut self, alignment: Align) -> Self {
+        self.vertical_alignment = alignment;
+        self
+    }
+
+    /// Sets the flex axis of the [`Block`] .
+    pub fn flex_axis(mut self, flex_axis: flex::Axis) -> Self {
+        self.flex_axis = flex_axis;
+        self
+    }
+
+    /// Centers the contents in the horizontal axis of the [`Container`].
+    pub fn center_x(mut self) -> Self {
+        self.horizontal_alignment = Align::Center;
+        self
+    }
+
+    /// Centers the contents in the vertical axis of the [`Container`].
+    pub fn center_y(mut self) -> Self {
+        self.vertical_alignment = Align::Center;
+        self
+    }
+
+    /// Sets the style of the [`Container`].
+    pub fn style(mut self, style: impl Into<Renderer::Style>) -> Self {
+        self.style = style.into();
         self
     }
 
@@ -117,21 +163,31 @@ where
         renderer: &Renderer,
         limits: &layout::Limits,
     ) -> layout::Node {
+        let padding = f32::from(self.padding);
+
         let limits = limits
+	    .loose()
             .max_width(self.max_width)
             .max_height(self.max_height)
             .width(self.width)
-            .height(self.height);
+            .height(self.height)
+            .pad(padding);
 
-        layout::flex::resolve(
+        let align_item = match self.flex_axis {
+            crate::Axis::Horizontal => self.vertical_alignment,
+            crate::Axis::Vertical => self.horizontal_alignment
+        };
+        let mut l = layout::flex::resolve(
             self.flex_axis,
             renderer,
             &limits,
             self.padding as f32,
             self.spacing as f32,
-            self.align_items,
+            align_item,
             &self.children,
-        )
+        );
+        l.align(self.horizontal_alignment, self.vertical_alignment, limits.resolve(l.size()));
+        l
     }
 
     fn on_event(
@@ -173,6 +229,7 @@ where
             layout,
             cursor_position,
             viewport,
+            &self.style,
         )
     }
 
@@ -180,13 +237,14 @@ where
         struct Marker;
         std::any::TypeId::of::<Marker>().hash(state);
 
+        self.padding.hash(state);
         self.width.hash(state);
         self.height.hash(state);
         self.max_width.hash(state);
         self.max_height.hash(state);
-        self.align_items.hash(state);
-        self.spacing.hash(state);
-        self.padding.hash(state);
+        // self.align_items.hash(state);
+        // self.spacing.hash(state);
+        // self.padding.hash(state);
 
         for child in &self.children {
             child.widget.hash_layout(state);
@@ -211,7 +269,10 @@ where
 /// able to use a [`Block`] in your user interface.
 ///
 /// [renderer]: crate::renderer
-pub trait Renderer: crate::Renderer + Sized {
+pub trait Renderer: crate::Renderer + Sized{
+    /// The style supported by this renderer.
+    type Style: Default;
+
     /// Draws a [`Block`].
     ///
     /// It receives:
@@ -225,6 +286,7 @@ pub trait Renderer: crate::Renderer + Sized {
         layout: Layout<'_>,
         cursor_position: Point,
         viewport: &Rectangle,
+        style: &Self::Style,
     ) -> Self::Output;
 }
 

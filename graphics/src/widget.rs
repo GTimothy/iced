@@ -8,6 +8,7 @@
 //! use iced_graphics::{button, Button};
 //! ```
 
+pub mod block;
 pub mod button;
 pub mod checkbox;
 pub mod container;
@@ -22,7 +23,6 @@ pub mod slider;
 pub mod svg;
 pub mod text_input;
 
-mod block;
 mod space;
 mod text;
 

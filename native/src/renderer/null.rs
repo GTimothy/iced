@@ -27,13 +27,16 @@ impl Renderer for Null {
 }
 
 impl block::Renderer for Null {
+    type Style = ();
+
     fn draw<Message>(
         &mut self,
         _defaults: &Self::Defaults,
-        _content: &[Element<'_, Message, Self>],
+        _children: &[Element<'_, Message, Self>],
         _layout: Layout<'_>,
         _cursor_position: Point,
         _viewport: &Rectangle,
+        _style: &Self::Style,
     ) {
     }
 }
@@ -70,7 +73,7 @@ impl text::Renderer for Null {
 }
 
 impl scrollable::Renderer for Null {
-    type Style = ();
+    type StyleScroll = ();
 
     fn scrollbar(
         &self,
@@ -94,7 +97,7 @@ impl scrollable::Renderer for Null {
         _is_mouse_over_scrollbar: bool,
         _scrollbar: Option<scrollable::Scrollbar>,
         _offset: u32,
-        _style: &Self::Style,
+        _style: &Self::StyleScroll,
         _content: Self::Output,
     ) {
     }

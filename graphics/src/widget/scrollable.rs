@@ -19,7 +19,7 @@ impl<B> scrollable::Renderer for Renderer<B>
 where
     B: Backend,
 {
-    type Style = Box<dyn iced_style::scrollable::StyleSheet>;
+    type StyleScroll = Box<dyn StyleSheet>;
     fn scrollbar(
         &self,
         bounds: Rectangle,
@@ -152,7 +152,7 @@ where
         is_mouse_over_scrollbar: bool,
         scrollbar: Option<scrollable::Scrollbar>,
         offset: u32,
-        style_sheet: &Self::Style,
+        style_sheet: &Self::StyleScroll,
         (content, mouse_interaction): Self::Output,
     ) -> Self::Output {
         (

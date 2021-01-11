@@ -1,4 +1,4 @@
-use iced::{container, radio, rule, scrollable};
+use iced::{block, container, radio, rule, scrollable};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Theme {
@@ -21,6 +21,15 @@ impl From<Theme> for Box<dyn container::StyleSheet> {
         match theme {
             Theme::Light => Default::default(),
             Theme::Dark => dark::Container.into(),
+        }
+    }
+}
+
+impl From<Theme> for Box<dyn block::StyleSheet> {
+    fn from(theme: Theme) -> Self {
+        match theme {
+            Theme::Light => Default::default(),
+            Theme::Dark => dark::Block.into(),
         }
     }
 }
@@ -53,7 +62,7 @@ impl From<Theme> for Box<dyn rule::StyleSheet> {
 }
 
 mod dark {
-    use iced::{container, radio, rule, scrollable, Color};
+    use iced::{block, container, radio, rule, scrollable, Color};
 
     const BACKGROUND: Color = Color::from_rgb(
         0x36 as f32 / 255.0,
@@ -103,6 +112,21 @@ mod dark {
                 .into(),
                 text_color: Color::WHITE.into(),
                 ..container::Style::default()
+            }
+        }
+    }
+    pub struct Block;
+
+    impl block::StyleSheet for Block {
+        fn style(&self) -> block::Style {
+            block::Style {
+                background: Color {
+                    a: 0.99,
+                    ..BACKGROUND
+                }
+                .into(),
+                text_color: Color::WHITE.into(),
+                ..block::Style::default()
             }
         }
     }

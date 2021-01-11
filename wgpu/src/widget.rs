@@ -9,6 +9,7 @@
 //! ```
 use crate::Renderer;
 
+pub mod block;
 pub mod button;
 pub mod checkbox;
 pub mod container;

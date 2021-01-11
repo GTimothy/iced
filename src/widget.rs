@@ -16,7 +16,7 @@
 #[cfg(not(target_arch = "wasm32"))]
 mod platform {
     pub use crate::renderer::widget::{
-        button, checkbox, container, pane_grid, pick_list, progress_bar, radio,
+        block, button, checkbox, container, pane_grid, pick_list, progress_bar, radio,
         rule, scrollable, slider, text_input, Block, Space, Text,
     };
 

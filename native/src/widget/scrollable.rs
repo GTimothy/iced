@@ -25,7 +25,7 @@ pub struct Scrollable<'a, Message, Renderer: self::Renderer> {
     scrollbar_margin: u16,
     scroller_width: u16,
     content: Block<'a, Message, Renderer>,
-    style: Renderer::Style,
+    style: Renderer::StyleScroll,
     axis: Axis,
 }
 
@@ -42,7 +42,7 @@ impl<'a, Message, Renderer: self::Renderer> Scrollable<'a, Message, Renderer> {
             scrollbar_margin: 0,
             scroller_width: 10,
             content: Block::new(axis),
-            style: Renderer::Style::default(),
+            style: Renderer::StyleScroll::default(),
             axis,
         }
     }
@@ -130,7 +130,7 @@ impl<'a, Message, Renderer: self::Renderer> Scrollable<'a, Message, Renderer> {
     }
 
     /// Sets the style of the [`Scrollable`] .
-    pub fn style(mut self, style: impl Into<Renderer::Style>) -> Self {
+    pub fn style(mut self, style: impl Into<Renderer::StyleScroll>) -> Self {
         self.style = style.into();
         self
     }
@@ -747,10 +747,10 @@ pub struct Scroller {
 /// able to use a [`Scrollable`] in your user interface.
 ///
 /// [renderer]: crate::renderer
-pub trait Renderer: block::Renderer + Sized {
+pub trait Renderer: block::Renderer + Sized{
     /// The style supported by this renderer.
-    type Style: Default;
-
+    // type StyleScroll = core::default::Default;
+    type StyleScroll: Default;
     /// Returns the [`Scrollbar`] given the bounds and content bounds of a
     /// [`Scrollable`].
     fn scrollbar(
@@ -784,7 +784,7 @@ pub trait Renderer: block::Renderer + Sized {
         is_mouse_over_scrollbar: bool,
         scrollbar: Option<Scrollbar>,
         offset: u32,
-        style: &Self::Style,
+        style: &Self::StyleScroll,
         content: Self::Output,
     ) -> Self::Output;
 }
