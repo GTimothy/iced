@@ -95,7 +95,7 @@ where
         let on_toggle = self.on_toggle.clone();
         let is_checked = self.is_checked;
 
-        let row_class = style_sheet.insert(bump, css::Rule::Block(css::Layout::Row));
+        let row_class = style_sheet.insert(bump, css::Rule::Block(css::FlexAxis::Row));
 
         let spacing_class = style_sheet.insert(bump, css::Rule::Spacing(5));
 

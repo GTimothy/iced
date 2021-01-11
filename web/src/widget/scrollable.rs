@@ -16,14 +16,14 @@ pub struct Scrollable<'a, Message> {
 
 impl<'a, Message> Scrollable<'a, Message> {
     /// Creates a new [`Scrollable`] with the given [`State`].
-    pub fn new(_state: &'a mut State, layout: css::Layout) -> Self {
+    pub fn new(_state: &'a mut State, flex_axis: css::FlexAxis) -> Self {
         use std::u32;
 
         Scrollable {
             width: Length::Fill,
             height: Length::Shrink,
             max_height: u32::MAX,
-            content: Block::new(layout),
+            content: Block::new(flex_axis),
             style: Default::default(),
         }
     }

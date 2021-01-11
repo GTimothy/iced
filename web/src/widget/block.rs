@@ -16,17 +16,17 @@ pub struct Block<'a, Message> {
     max_height: u32,
     align_items: Align,
     children: Vec<Element<'a, Message>>,
-    layout:css::Layout
+    flex_axis:css::FlexAxis
 }
 
 impl<'a, Message> Block<'a, Message> {
     /// Creates an empty [`Block`].
-    pub fn new(layout: css::Layout) -> Self {
-        Self::with_children(Vec::new(), layout)
+    pub fn new(flex_axis: css::FlexAxis) -> Self {
+        Self::with_children(Vec::new(), flex_axis)
     }
 
     /// Creates a [`Block`] with the given elements.
-    pub fn with_children(children: Vec<Element<'a, Message>>, layout: css::Layout) -> Self {
+    pub fn with_children(children: Vec<Element<'a, Message>>, flex_axis: css::FlexAxis) -> Self {
         Block {
             spacing: 0,
             padding: 0,
@@ -36,7 +36,7 @@ impl<'a, Message> Block<'a, Message> {
             max_height: u32::MAX,
             align_items: Align::Start,
             children,
-            layout
+            flex_axis
         }
     }
 
@@ -111,7 +111,7 @@ impl<'a, Message> Widget<Message> for Block<'a, Message> {
             .map(|element| element.widget.node(bump, publish, style_sheet))
             .collect();
 
-        let row_class = style_sheet.insert(bump, css::Rule::Block(self.layout));
+        let row_class = style_sheet.insert(bump, css::Rule::Block(self.flex_axis));
 
         let spacing_class =
             style_sheet.insert(bump, css::Rule::Spacing(self.spacing));

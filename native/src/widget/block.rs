@@ -1,6 +1,6 @@
 //! Distribute content horizontally or vertically.
 use crate::event::{self, Event};
-use crate::layout;
+use crate::layout::{self, flex};
 use crate::overlay;
 use crate::{
     Align, Clipboard, Element, Hasher, Layout, Length, Point, Rectangle, Widget,
@@ -20,17 +20,17 @@ pub struct Block<'a, Message, Renderer, > {
     max_height: u32,
     align_items: Align,
     children: Vec<Element<'a, Message, Renderer>>,
-    layout:layout::flex::Axis
+    flex_axis: flex::Axis
 }
 
 impl<'a, Message, Renderer> Block<'a, Message, Renderer> {
     /// Creates an empty [`Block`].
-    pub fn new(layout:layout::flex::Axis) -> Self {
-        Self::with_children(Vec::new(), layout)
+    pub fn new(flex_axis: flex::Axis) -> Self {
+        Self::with_children(Vec::new(), flex_axis)
     }
 
     /// Creates a [`Column`] with the given elements.
-    pub fn with_children( children: Vec<Element<'a, Message, Renderer>>,layout:layout::flex::Axis) -> Self {
+    pub fn with_children( children: Vec<Element<'a, Message, Renderer>>, flex_axis: flex::Axis) -> Self {
         Block {
             spacing: 0,
             padding: 0,
@@ -40,7 +40,7 @@ impl<'a, Message, Renderer> Block<'a, Message, Renderer> {
             max_height: u32::MAX,
             align_items: Align::Start,
             children,
-            layout
+            flex_axis
         }
     }
     /// Sets the vertical spacing _between_ elements.
@@ -124,7 +124,7 @@ where
             .height(self.height);
 
         layout::flex::resolve(
-            self.layout,
+            self.flex_axis,
             renderer,
             &limits,
             self.padding as f32,

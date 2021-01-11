@@ -5,7 +5,7 @@ use std::collections::BTreeMap;
 
 /// Flex property part of CSS rule of a VDOM node.
 #[derive(Debug, Clone, Copy)]
-pub enum Layout {
+pub enum FlexAxis {
     /// Vertical flex distribution
     Column,
 
@@ -16,7 +16,7 @@ pub enum Layout {
 #[derive(Debug)]
 pub enum Rule {
     /// Container with vertical or horizonal distribution
-    Block(Layout),
+    Block(FlexAxis),
 
     /// Padding of the container
     Padding(u16),
@@ -29,8 +29,8 @@ impl Rule {
     /// Returns the class name of the [`Rule`].
     pub fn class<'a>(&self) -> String {
         match self {
-            Rule::Block(Layout::Column) => String::from("c"),
-            Rule::Block(Layout::Row) => String::from("r"),
+            Rule::Block(FlexAxis::Column) => String::from("c"),
+            Rule::Block(FlexAxis::Row) => String::from("r"),
             Rule::Padding(padding) => format!("p-{}", padding),
             Rule::Spacing(spacing) => format!("s-{}", spacing),
         }
@@ -41,12 +41,12 @@ impl Rule {
         let class = self.class();
 
         match self {
-            Rule::Block(Layout::Column) => {
+            Rule::Block(FlexAxis::Column) => {
                 let body = "{ display: flex; flex-direction: column; }";
 
                 bumpalo::format!(in bump, ".{} {}", class, body).into_bump_str()
             }
-            Rule::Block(Layout::Row) => {
+            Rule::Block(FlexAxis::Row) => {
                 let body = "{ display: flex; flex-direction: row; }";
 
                 bumpalo::format!(in bump, ".{} {}", class, body).into_bump_str()

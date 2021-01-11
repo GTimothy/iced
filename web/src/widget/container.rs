@@ -103,7 +103,7 @@ where
     ) -> dodrio::Node<'b> {
         use dodrio::builder::*;
 
-        let column_class = style_sheet.insert(bump, css::Rule::Block(css::Layout::Column));
+        let column_class = style_sheet.insert(bump, css::Rule::Block(css::FlexAxis::Column));
 
         let padding_class =
             style_sheet.insert(bump, css::Rule::Padding(self.padding));
