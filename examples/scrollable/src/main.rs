@@ -1,6 +1,9 @@
 mod style;
 
-use iced::{Axis ,Text ,Space ,Settings ,Scrollable ,Sandbox ,Rule ,Radio ,Length ,Element ,Container ,Block ,scrollable};
+use iced::{
+    scrollable, Axis, Block, Container, Element, Length, Radio, Rule, Sandbox,
+    Scrollable, Settings, Space, Text,
+};
 
 pub fn main() -> iced::Result {
     ScrollableDemo::run(Settings::default())
@@ -42,7 +45,9 @@ impl Sandbox for ScrollableDemo {
         } = self;
 
         let choose_theme = style::Theme::ALL.iter().fold(
-            Block::new(Axis::Vertical).spacing(10).push(Text::new("Choose a theme:")),
+            Block::new(Axis::Vertical)
+                .spacing(10)
+                .push(Text::new("Choose a theme:")),
             |column, option| {
                 column.push(
                     Radio::new(
@@ -93,7 +98,23 @@ impl Sandbox for ScrollableDemo {
                                 scroller_width
                             )));
                     }
-
+                    if let Some(inner_variant) = &mut variant.inner_variant {
+                        let iv = &mut (**inner_variant);
+                        scrollable = scrollable
+                            .push(
+                                Scrollable::new(&mut iv.state, Axis::Horizontal)
+                                .padding(10)
+                                .width(Length::Fill)
+                                .height(Length::Fill)
+                                .style(*theme)
+                                .push(Text::new(iv.title))
+                                .push(Text::new(
+                                    "Some content that should NOT wrap within the top scrollable \
+                                    because it is in a horizontal scrollable. Let's output a lot \
+                                    of short words, so that we'll make sure to see how that it \
+                                    works as expected with this horizontal scrollbar.",
+                                )))
+                    }
                     scrollable = scrollable
                         .push(Space::with_height(Length::Units(100)))
                         .push(Text::new(
@@ -114,7 +135,7 @@ impl Sandbox for ScrollableDemo {
                         .into()
                 })
                 .collect(),
-                Axis::Horizontal
+            Axis::Horizontal,
         )
         .spacing(20)
         .width(Length::Fill)
@@ -144,6 +165,7 @@ struct Variant {
     scrollbar_width: Option<u16>,
     scrollbar_margin: Option<u16>,
     scroller_width: Option<u16>,
+    inner_variant: Option<Box<Variant>>,
 }
 
 impl Variant {
@@ -155,6 +177,14 @@ impl Variant {
                 scrollbar_width: None,
                 scrollbar_margin: None,
                 scroller_width: None,
+                inner_variant: Some(Box::new(Self {
+                    title: "Horizontal Scrollbar",
+                    state: scrollable::State::new(),
+                    scrollbar_width: None,
+                    scrollbar_margin: None,
+                    scroller_width: None,
+                    inner_variant: None,
+                })),
             },
             Self {
                 title: "Slimmed & Margin",
@@ -162,6 +192,7 @@ impl Variant {
                 scrollbar_width: Some(4),
                 scrollbar_margin: Some(3),
                 scroller_width: Some(4),
+                inner_variant: None,
             },
             Self {
                 title: "Wide Scroller",
@@ -169,6 +200,7 @@ impl Variant {
                 scrollbar_width: Some(4),
                 scrollbar_margin: None,
                 scroller_width: Some(10),
+                inner_variant: None,
             },
             Self {
                 title: "Narrow Scroller",
@@ -176,6 +208,7 @@ impl Variant {
                 scrollbar_width: Some(10),
                 scrollbar_margin: None,
                 scroller_width: Some(4),
+                inner_variant: None,
             },
         ]
     }
