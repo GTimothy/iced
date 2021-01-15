@@ -62,6 +62,9 @@ pub use qr_code::QRCode;
 
 pub use iced_native::Space;
 
+/// A Layer to layer a content..
+pub type Layer<'a, Message> = iced_native::Layer<'a, Message, Renderer>;
+
 /// A container that distributes its contents vertically.
 pub type Column<'a, Message> = iced_native::Column<'a, Message, Renderer>;
 

@@ -24,6 +24,7 @@ pub mod checkbox;
 pub mod column;
 pub mod container;
 pub mod image;
+pub mod layer;
 pub mod pane_grid;
 pub mod pick_list;
 pub mod progress_bar;
@@ -47,6 +48,8 @@ pub use column::Column;
 pub use container::Container;
 #[doc(no_inline)]
 pub use image::Image;
+#[doc(no_inline)]
+pub use layer::Layer;
 #[doc(no_inline)]
 pub use pane_grid::PaneGrid;
 #[doc(no_inline)]
@@ -103,6 +106,8 @@ pub trait Widget<Message, Renderer>
 where
     Renderer: crate::Renderer,
 {
+    /// Returns if the layer level.
+    fn layer(&self) -> i32 {0}
     /// Returns the width of the [`Widget`].
     fn width(&self) -> Length;
 

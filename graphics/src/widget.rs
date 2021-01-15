@@ -22,6 +22,7 @@ pub mod svg;
 pub mod text_input;
 
 mod column;
+mod layer;
 mod row;
 mod space;
 mod text;
@@ -50,6 +51,7 @@ pub use slider::Slider;
 pub use text_input::TextInput;
 
 pub use column::Column;
+pub use layer::Layer;
 pub use image::Image;
 pub use row::Row;
 pub use space::Space;
